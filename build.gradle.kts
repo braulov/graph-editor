@@ -14,6 +14,17 @@ dependencies {
     implementation("org.graphstream:gs-core:2.0")
     implementation("org.graphstream:gs-ui-javafx:2.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.openjfx:javafx-controls:21")
+    implementation("org.openjfx:javafx-web:21")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.openjfx:javafx-controls:21")
+    testImplementation("org.openjfx:javafx-web:21")
+    testImplementation("org.testfx:testfx-core:4.0.16-alpha")
+    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+
 }
 javafx {
     version = "21"
@@ -29,3 +40,20 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 tasks.withType<JavaCompile> {
     options.release.set(21) // Целевая версия Java
 }
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+    afterSuite(KotlinClosure2<TestDescriptor, TestResult, Unit>({ desc, result ->
+        if (desc.parent == null) { // Проверяем, что это корневой suite
+            println("Test results: ${result.resultType} " +
+                    "(${result.testCount} tests, " +
+                    "${result.successfulTestCount} passed, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped)")
+        }
+    }))
+}
+
